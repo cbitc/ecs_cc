@@ -1,0 +1,30 @@
+{
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "g++.exe",
+            "args": [
+                "${file}",
+                "-o",
+                "${workspaceFolder}\\bin\\${fileBasenameNoExtension}.exe",
+                "-g",
+                "-static-libgcc",
+                "-fexec-charset=GBK",
+                "-finput-charset=GBK",
+                "-std=c++17"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "clear": true
+            },
+            "problemMatcher": "$gcc"
+            
+        },
+    ],
+    "version": "2.0.0"
+}
