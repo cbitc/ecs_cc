@@ -4,6 +4,16 @@
 
 namespace ECS
 {
+    using componentID_t = uint8_t;
+
+    struct ComponentInfo
+    {
+        componentID_t id;
+        void* data;
+        ComponentInfo(componentID_t id_,void* data_):id(id_),data(data_){}
+        ComponentInfo() = default;
+    };
+
     template<typename T>
     class ComponentPool final
     {
@@ -32,14 +42,6 @@ namespace ECS
         using DestoryFunction = void(*)(void*);
         using DestoryFunctionContainer = std::vector<DestoryFunction>;
     public:
-        using componentID_t = uint8_t;
-
-        struct ComponentInfo
-        {
-            componentID_t id;
-            void* data;
-        };
-    public:
 
         template<typename T>
         static componentID_t componentID() {
@@ -49,12 +51,11 @@ namespace ECS
 
 
         template<typename T, typename...Args>
-        static ComponentInfo create(Args&&...args) {
+        static T* create(Args&&...args) {
             if (!hasRegistryDestory<T>()) {
                 registryDestory<T>(&ComponentPool<T>::destory);
             }
-            return ComponentInfo{ componentID<T>(),
-            ComponentPool<T>::instance(std::forward<Args>(args)...) };
+            return ComponentPool<T>::instance(std::forward<Args>(args)...);
         }
 
         static void destory(ComponentInfo& info) {
