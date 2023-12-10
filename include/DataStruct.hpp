@@ -1,11 +1,8 @@
 #pragma once
 
-#include<iostream>
-#include<vector>
 #include<type_traits>
-#include<cassert>
+#include<vector>
 
-#define assertm(msg,condition) assert((msg),(condition))
 
 namespace CDataStruct
 {
@@ -14,7 +11,7 @@ namespace CDataStruct
     {
     public:
         using value_t = T;
-        
+
         SparseSet() {
             sparse_.resize(1, null);
         }
@@ -81,7 +78,7 @@ namespace CDataStruct
     template<typename Key_T, typename Value_T, typename = std::enable_if_t<std::is_integral_v<Key_T>>>
     class DensMap final
     {
-        
+
     public:
         using pack_node = std::pair<Key_T, Value_T>;
 
@@ -95,6 +92,10 @@ namespace CDataStruct
             }
             sparse_[key] = packed_.size();
             packed_.emplace_back(key, value);
+        }
+
+        void insert(Key_T key) {
+            insert(key, Value_T{});
         }
 
         bool contain(Key_T key)const {
@@ -152,53 +153,4 @@ namespace CDataStruct
         std::vector<pack_node> packed_;
         inline static constexpr Key_T null = std::numeric_limits<Key_T>::max();
     };
-}
-
-
-
-namespace ECS
-{
-    using entity_t = uint32_t;
-    using Entity = entity_t;
-
-    struct ComponentSet
-    {
-        std::vector<void*> instances_;
-        std::vector<void*> cache_;
-
-    public:
-        template<typename T, typename...Args>
-        T* create(Args&&...args) {
-            if (cache_.empty()) {
-                instances_.emplace_back(args...);
-            } else {
-
-            }
-            return static_cast<T*>(instances_.back());
-        }
-    };
-
-    class EntityContainer final
-    {
-    public:
-    private:
-        CDataStruct::SparseSet<Entity> entitys_;
-        
-
-    };
-
-
-    class World
-    {
-        using Entity_Container = CDataStruct::SparseSet<Entity>;
-        using Component_Container = ComponentSet;
-
-
-    private:
-        std::vector<Component_Container> components_;
-        Entity_Container entitys_;
-    public:
-
-    };
-
 }
