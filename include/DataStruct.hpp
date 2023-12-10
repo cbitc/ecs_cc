@@ -17,7 +17,7 @@ namespace CDataStruct
         }
 
         void insert(value_t value) {
-            if (value >= pakced_.size()) {
+            if (value >= sparse_.size()) {
                 sparse_.resize(value << 1, null);
             }
             sparse_[value] = pakced_.size();
