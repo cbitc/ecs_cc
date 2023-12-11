@@ -15,7 +15,7 @@ namespace ECS
 
 /**
  * @brief 
- * 
+ * 管理实体和组件之间关系的容器
  */
 class World
 {
@@ -25,15 +25,17 @@ class World
     
     /**
      * @brief 
-     * 
+     * 负责存放单个实体关系到的所有组件
      */
     class ComponentContainer final
     {
     public:
+
+
         
         /**
          * @brief 
-         * 
+         * 向组件集合里添加一个组件
          * @param info 
          */
         void insert(const ComponentInfo& info) noexcept {
@@ -43,10 +45,10 @@ class World
 
 
         /**
-         *@brief 
-         * 
-         * @param id 
-         * @param data 
+         * @brief
+         * 根据传入的组件ID,和组件数据向在集合中就地构造一个组件信息
+         * @param[in] id 组件ID
+         * @param[in] data 组件的指针
          */
         void insert(componentID_t id,void* data) noexcept {
             componentInfos_.emplace_back(id,data);
@@ -55,11 +57,11 @@ class World
 
 
         /**
-         *@brief 
-         * 
-         * @param id 
-         * @return true 
-         * @return false 
+         * @brief 
+         * 根据传入的组件ID,判断某一组件是否在集合里
+         * @param[in] id 组件ID
+         * @return true 存在
+         * @return false 不存在
          */
         bool contain(componentID_t id) const noexcept {
             for (const ComponentInfo& info : componentInfos_) {
@@ -71,11 +73,13 @@ class World
 
 
         /**
-         *@brief 
-         * 
-         * @param id 
-         * @return true 
-         * @return false 
+         * @brief 
+         * 根据传入的组件ID,从集合里移除某个组件
+         * @param[in] id 组件ID
+         * @return true 表示移除成功;
+         * @return false 移除失败;
+         * @note 
+         * 若该组件不在集合里,该方法不做任何事,返回值为false;
          */
         bool remove(componentID_t id) noexcept {
             for (ComponentInfo& info : componentInfos_) {
@@ -90,10 +94,13 @@ class World
 
 
         /**
-         *@brief 
-         * 
-         * @param id 
-         * @return ComponentInfo& 
+         * @brief 
+         * 根据传入的组件ID,返回组件信息的引用
+         * @param[in] id 组件ID
+         * @retval ComponentInfo&
+         * @return 如果组件存在则返回对应的Info,否则返回值未定义
+         * @warning
+         * 使用该方法前要确保组件在集合中,否则将产生未定义行为
          */
         ComponentInfo& operator[](componentID_t id) noexcept {
             for (ComponentInfo& info : componentInfos_) {
@@ -107,10 +114,13 @@ class World
 
 
         /**
-         *@brief 
-         * 
-         * @param id 
-         * @return const ComponentInfo& 
+         * @brief 
+         * 根据传入的组件ID,返回组件信息的常引用
+         * @param[in] id 组件ID
+         * @retval const ComponentInfo&
+         * @return 如果组件存在则返回对应的Info,否则返回值未定义
+         * @warning
+         * 使用该方法前要确保组件在集合中,否则将产生未定义行为
          */
         const ComponentInfo& operator[](componentID_t id) const noexcept {
             for (const ComponentInfo& info : componentInfos_) {
@@ -125,8 +135,9 @@ class World
 
         /**
          * @brief 
-         * 
-         * @return std::vector<ComponentInfo>::iterator 
+         * 获取组件集合的起始迭代器
+         * @retval std::vector<ComponentInfo>::iterator
+         * @return 组件集合的起始迭代器
          */
         std::vector<ComponentInfo>::iterator begin() noexcept {
             return componentInfos_.begin();
@@ -135,9 +146,10 @@ class World
 
 
         /**
-         *@brief 
-         * 
-         * @return std::vector<ComponentInfo>::const_iterator 
+         * @brief 
+         * 获取组件集合的const起始迭代器
+         * @retval std::vector<ComponentInfo>::const_iterator
+         * @return 组件集合的const起始迭代器
          */
         std::vector<ComponentInfo>::const_iterator begin() const noexcept {
             return componentInfos_.begin();
@@ -146,9 +158,10 @@ class World
 
 
         /**
-         *@brief 
-         * 
-         * @return std::vector<ComponentInfo>::iterator 
+         * @brief 
+         * 获取组件集合的终止迭代器
+         * @retval std::vector<ComponentInfo>::iterator
+         * @return 组件集合的终止迭代器
          */
         std::vector<ComponentInfo>::iterator end() noexcept {
             return componentInfos_.end();
@@ -157,9 +170,10 @@ class World
 
 
         /**
-         *@brief 
-         * 
-         * @return std::vector<ComponentInfo>::const_iterator 
+         * @brief 
+         * 获取组件集合的const终止迭代器
+         * @retval std::vector<ComponentInfo>::const_iterator
+         * @return 组件集合的const终止迭代器
          */
         std::vector<ComponentInfo>::const_iterator end() const noexcept {
             return componentInfos_.end();
@@ -168,7 +182,7 @@ class World
 
 
     private:
-        std::vector<ComponentInfo> componentInfos_;
+        std::vector<ComponentInfo> componentInfos_; 
     };
 
 
@@ -176,8 +190,8 @@ class World
 
     
     /**
-     *@brief 
-     * 
+     * @brief 
+     * 某一类型的组件与所有拥有该组件的实体的对应关系的集合
      */
     class ComponentMap final
     {
@@ -187,10 +201,13 @@ class World
 
         
         /**
-         *@brief 
-         * 
-         * @param id 
-         * @return CDataStruct::SparseSet<Entity>& 
+         * @brief 
+         * 根据传入的组件ID,获取所有拥有该类型组件的所有实体的集合
+         * @param[in] id 组件ID
+         * @retval CDataStruct::SparseSet<Entity>&
+         * @return 所有拥有该类型组件的所有实体的集合
+         * @note
+         * 如果该类型的组件不在容器内,则方法将创建该类型组件与实体的对应关系,并将其返回
          */
         CDataStruct::SparseSet<Entity>& operator[](componentID_t id) noexcept {
             if (id >= map_.size()) {
@@ -203,11 +220,11 @@ class World
 
         
         /**
-         *@brief 
-         * 
-         * @param id 
-         * @return true 
-         * @return false 
+         * @brief 
+         * 根据传入的组件ID,判断该类型组件是否在容器内
+         * @param[in] id 组件ID 
+         * @return true 表示存在;
+         * @return false 表示不存在;
          */
         bool contain(componentID_t id) const noexcept {
             return id < map_.size();
@@ -216,9 +233,10 @@ class World
 
         
         /**
-         *@brief 
-         * 
-         * @return std::vector<CDataStruct::SparseSet<Entity>>::iterator 
+         * @brief 
+         * 获取容器的起始迭代器
+         * @retval std::vector<CDataStruct::SparseSet<Entity>>::iterator
+         * @return 容器的起始迭代器
          */
         std::vector<CDataStruct::SparseSet<Entity>>::iterator begin() noexcept {
             return map_.begin();
@@ -227,9 +245,10 @@ class World
 
 
         /**
-         *@brief 
-         * 
-         * @return std::vector<CDataStruct::SparseSet<Entity>>::const_iterator 
+         * @brief 
+         * 获取容器的const起始迭代器
+         * @retval std::vector<CDataStruct::SparseSet<Entity>>::const_iterator
+         * @return 容器的const起始迭代器
          */
         std::vector<CDataStruct::SparseSet<Entity>>::const_iterator begin() const noexcept {
             return map_.begin();
@@ -239,9 +258,10 @@ class World
 
 
         /**
-         *@brief 
-         * 
-         * @return std::vector<CDataStruct::SparseSet<Entity>>::iterator 
+         * @brief 
+         * 获取容器的终止迭代器
+         * @retval std::vector<CDataStruct::SparseSet<Entity>>::iterator
+         * @return 容器的终止迭代器
          */
         std::vector<CDataStruct::SparseSet<Entity>>::iterator end() noexcept {
             return map_.end();
@@ -251,9 +271,10 @@ class World
 
 
         /**
-         *@brief 
-         * 
-         * @return std::vector<CDataStruct::SparseSet<Entity>>::const_iterator 
+         * @brief 
+         * 获取容器的const终止迭代器
+         * @retval std::vector<CDataStruct::SparseSet<Entity>>::const_iterator
+         * @return 容器的const终止迭代器
          */
         std::vector<CDataStruct::SparseSet<Entity>>::const_iterator end() const noexcept {
             return map_.end();
@@ -262,19 +283,32 @@ class World
 
         
     private:
+        /// @brief 存储组件到实体集合映射关系的数据结构
         std::vector<CDataStruct::SparseSet<Entity>> map_;
     };
 
     
 
 public:
+
+    /// @brief 表示实体到组件集合映射的组件集合的类型
     using componentSet_t = ComponentContainer;
+
+    /// @brief 表示组件到实体集合映射的实体集合类型
     using entitySet_t = CDataStruct::SparseSet<Entity>;
+
+    /// @brief 表示实体到组件集合映射的类型
     using entityMap_t = CDataStruct::DenseMap<Entity,componentSet_t>;
+
+    /// @brief 表示组件到实体集合映射的类型
     using componentMap_t = ComponentMap;
 
 private:
+    
+    /// @brief 实体到组件集合映射的容器
     entityMap_t entityMap_;
+
+    /// @brief 组件到实体集合映射的容器
     componentMap_t componentMap_;
 
 public:
@@ -308,14 +342,18 @@ public:
 
 
 
-
+/**
+ * @brief 
+ * world的所有操作均通过该类进行
+ */
 class Registry final
 {
 
     /**
-     *@brief 
-     * 
-     * @return Entity 
+     * @brief 
+     * 产生一个实体ID
+     * @retval Entity
+     * @return 实体ID
      */
     Entity _get_entity() const {
         return EntityManager::spawn();
@@ -325,30 +363,33 @@ class Registry final
     
 public:
 
+
+    
     /**
-     *@brief Construct a new Registry object
-     * 
-     * @param world 
+     * @brief 
+     * 根据传入的world构造一个依赖于该world的Registry
+     * @param[in] world 
      */
     Registry(World& world) :world_(world) {}
 
 
 
     /**
-     *@brief 
-     * 
-     * @tparam T 
-     * @tparam Args 
-     * @return std::vector<Entity> 
+     * @brief 
+     * 根据传入的组件类型参数,返回一个包含所有组件的实体集合
+     * @tparam T 当前的组件类型
+     * @tparam Ts 剩余的组件类型
+     * @retval std::vector<Entity>
+     * @return 包含所有组件的实体集合
      */
-    template<typename T,typename...Args>
+    template<typename T,typename...Ts>
     std::vector<Entity> view() noexcept {
         componentID_t id = ComponentManager::componentID<T>();
         const World::entitySet_t& entitySet = world_.componentMap_[id];
         std::vector<Entity> entitys;
         for (Entity entity : entitySet) { entitys.push_back(entity); }
-        if constexpr (sizeof...(Args) != 0) {
-            doView<Args...>(entitys);
+        if constexpr (sizeof...(Ts) != 0) {
+            doView<Ts...>(entitys);
         }
         return entitys;
     }
@@ -356,13 +397,12 @@ public:
 
     
     /**
-     *@brief 
-     * 
-     * @tparam T 
-     * @tparam Args 
-     * @param entity 
-     * @param args 
-     * @return std::void_t<decltype(new T{ std::forward<Args>(args)... }) > 
+     * @brief 
+     * 给传入的实体构造类型为T的组件
+     * @tparam T 构造的组件类型
+     * @tparam Args 用于构造该组件的参数类型
+     * @param entity 目标实体
+     * @param args 用于构造该组件的参数
      */
     template<typename T,typename...Args>
     auto emplace(Entity entity,Args&&...args) noexcept ->
@@ -376,13 +416,12 @@ public:
 
 
     /**
-     *@brief 
+     * @brief 
      * 
      * @tparam T 
      * @tparam Args 
      * @param entity 
      * @param args 
-     * @return std::void_t<decltype(new T{ std::forward<Args>(args)... }) > 
      */
     template<typename T,typename...Args>
     auto replace(Entity entity,Args&&...args) noexcept ->
@@ -587,6 +626,21 @@ public:
 
 
 
+    template<typename T>
+    T* getResource() noexcept {
+        
+    }
+
+
+
+    template<typename t>
+    void addResource() noexcept {
+
+    }
+
+
+
+    
 private:
 
 

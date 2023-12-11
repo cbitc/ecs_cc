@@ -13,9 +13,9 @@ using componentID_t = uint8_t;
 
 
 /**
- *@brief
- *包含组件的ID和数据的结构体.
- *用于描述一个组件所需的最小信息
+ * @brief
+ * 包含组件的ID和数据的结构体.
+ * 用于描述一个组件所需的最小信息
  */
 struct ComponentInfo
 {
@@ -30,12 +30,12 @@ struct ComponentInfo
 
 
 /**
- *@brief
- *组件池,所有的组件必须通过这个类进行创建和销毁
+ * @brief
+ * 组件池,所有的组件必须通过这个类进行创建和销毁
  * @tparam T 组件类型
  *
- *@note
- *该类内部维护一个组件的缓冲池,避免对new和delete的大量调用
+ * @note
+ * 该类内部维护一个组件的缓冲池,避免对new和delete的大量调用
  *
  */
 template<typename T>
@@ -45,13 +45,13 @@ class ComponentPool final
 public:
 
     /**
-     *@brief
-     *通过传入的参数实例化一个组件
+     * @brief
+     * 通过传入的参数实例化一个组件
      *
      * @tparam Args 参数包,展开后是各个传入的参数类型
      * @param[in] args 传入的参数
      * @return decltype(new T{ std::forward<Args>(args)... })
-     *@note
+     * @note
      *该方法实例化组件时会先检查缓冲池中是否还存有实体
      *如果有则直接将实体指针取出并返回,否则调用new 方法创建实体
      */
@@ -69,9 +69,9 @@ public:
 
 
     /**
-     *@brief
-     *接收一个组件的指针,执行组件的销毁动作.
-     *该函数并不会真正销毁实体,而是将其存入缓冲池
+     * @brief
+     * 接收一个组件的指针,执行组件的销毁动作.
+     * 该函数并不会真正销毁实体,而是将其存入缓冲池
      * @param[in] ins 要销毁的组件的指针
      */
     static void destory(void* ins) {
@@ -88,9 +88,9 @@ private:
 
 
 /**
- *@brief
- *对组件所有操作的一个集合.
- *类内的所有属性和方法皆为静态,该类并不会具体实例化
+ * @brief
+ * 对组件所有操作的一个集合.
+ * 类内的所有属性和方法皆为静态,该类并不会具体实例化
  *
  */
 class ComponentManager final
@@ -102,7 +102,7 @@ class ComponentManager final
 public:
 
     /**
-     *@brief 对传入的组件类型T,返回该组件类型的ID
+     * @brief 对传入的组件类型T,返回该组件类型的ID
      *
      * @tparam T 传入的组件类型
      * @return componentID_t
