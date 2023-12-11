@@ -13,35 +13,54 @@
 namespace ECS
 {
 
+/**
+ * @brief 
+ * 
+ */
 class World
 {
     friend class Registry;
 
 
-
-
-
-
+    
+    /**
+     * @brief 
+     * 
+     */
     class ComponentContainer final
     {
     public:
-
+        
+        /**
+         * @brief 
+         * 
+         * @param info 
+         */
         void insert(const ComponentInfo& info) noexcept {
             componentInfos_.push_back(info);
         }
 
 
 
-
-
+        /**
+         *@brief 
+         * 
+         * @param id 
+         * @param data 
+         */
         void insert(componentID_t id,void* data) noexcept {
             componentInfos_.emplace_back(id,data);
         }
 
 
 
-
-
+        /**
+         *@brief 
+         * 
+         * @param id 
+         * @return true 
+         * @return false 
+         */
         bool contain(componentID_t id) const noexcept {
             for (const ComponentInfo& info : componentInfos_) {
                 if (info.id == id)return true;
@@ -51,8 +70,13 @@ class World
 
 
 
-
-
+        /**
+         *@brief 
+         * 
+         * @param id 
+         * @return true 
+         * @return false 
+         */
         bool remove(componentID_t id) noexcept {
             for (ComponentInfo& info : componentInfos_) {
                 if (info.id == id) {
@@ -65,8 +89,12 @@ class World
 
 
 
-
-
+        /**
+         *@brief 
+         * 
+         * @param id 
+         * @return ComponentInfo& 
+         */
         ComponentInfo& operator[](componentID_t id) noexcept {
             for (ComponentInfo& info : componentInfos_) {
                 if (info.id == id)return info;
@@ -78,8 +106,12 @@ class World
 
 
 
-
-
+        /**
+         *@brief 
+         * 
+         * @param id 
+         * @return const ComponentInfo& 
+         */
         const ComponentInfo& operator[](componentID_t id) const noexcept {
             for (const ComponentInfo& info : componentInfos_) {
                 if (info.id == id)return info;
@@ -91,37 +123,47 @@ class World
 
 
 
-
-
+        /**
+         * @brief 
+         * 
+         * @return std::vector<ComponentInfo>::iterator 
+         */
         std::vector<ComponentInfo>::iterator begin() noexcept {
             return componentInfos_.begin();
         }
 
 
 
-
-
+        /**
+         *@brief 
+         * 
+         * @return std::vector<ComponentInfo>::const_iterator 
+         */
         std::vector<ComponentInfo>::const_iterator begin() const noexcept {
             return componentInfos_.begin();
         }
 
 
 
-
-
+        /**
+         *@brief 
+         * 
+         * @return std::vector<ComponentInfo>::iterator 
+         */
         std::vector<ComponentInfo>::iterator end() noexcept {
             return componentInfos_.end();
         }
 
 
 
-
-
+        /**
+         *@brief 
+         * 
+         * @return std::vector<ComponentInfo>::const_iterator 
+         */
         std::vector<ComponentInfo>::const_iterator end() const noexcept {
             return componentInfos_.end();
         }
-
-
 
 
 
@@ -132,23 +174,24 @@ class World
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+    
+    /**
+     *@brief 
+     * 
+     */
     class ComponentMap final
     {
 
     public:
 
+
+        
+        /**
+         *@brief 
+         * 
+         * @param id 
+         * @return CDataStruct::SparseSet<Entity>& 
+         */
         CDataStruct::SparseSet<Entity>& operator[](componentID_t id) noexcept {
             if (id >= map_.size()) {
                 map_.resize(id + 1);
@@ -158,25 +201,36 @@ class World
         }
 
 
-
-
-
+        
+        /**
+         *@brief 
+         * 
+         * @param id 
+         * @return true 
+         * @return false 
+         */
         bool contain(componentID_t id) const noexcept {
             return id < map_.size();
         }
 
 
-
-
-
+        
+        /**
+         *@brief 
+         * 
+         * @return std::vector<CDataStruct::SparseSet<Entity>>::iterator 
+         */
         std::vector<CDataStruct::SparseSet<Entity>>::iterator begin() noexcept {
             return map_.begin();
         }
 
 
 
-
-
+        /**
+         *@brief 
+         * 
+         * @return std::vector<CDataStruct::SparseSet<Entity>>::const_iterator 
+         */
         std::vector<CDataStruct::SparseSet<Entity>>::const_iterator begin() const noexcept {
             return map_.begin();
         }
@@ -184,8 +238,11 @@ class World
 
 
 
-
-
+        /**
+         *@brief 
+         * 
+         * @return std::vector<CDataStruct::SparseSet<Entity>>::iterator 
+         */
         std::vector<CDataStruct::SparseSet<Entity>>::iterator end() noexcept {
             return map_.end();
         }
@@ -193,29 +250,22 @@ class World
 
 
 
-
-
+        /**
+         *@brief 
+         * 
+         * @return std::vector<CDataStruct::SparseSet<Entity>>::const_iterator 
+         */
         std::vector<CDataStruct::SparseSet<Entity>>::const_iterator end() const noexcept {
             return map_.end();
         }
 
 
-
-
-
+        
     private:
         std::vector<CDataStruct::SparseSet<Entity>> map_;
     };
 
-
-
-
-
-
-
-
-
-
+    
 
 public:
     using componentSet_t = ComponentContainer;
@@ -262,23 +312,35 @@ public:
 class Registry final
 {
 
+    /**
+     *@brief 
+     * 
+     * @return Entity 
+     */
     Entity _get_entity() const {
         return EntityManager::spawn();
     }
 
 
-
-
-
-
+    
 public:
 
+    /**
+     *@brief Construct a new Registry object
+     * 
+     * @param world 
+     */
     Registry(World& world) :world_(world) {}
 
 
 
-
-
+    /**
+     *@brief 
+     * 
+     * @tparam T 
+     * @tparam Args 
+     * @return std::vector<Entity> 
+     */
     template<typename T,typename...Args>
     std::vector<Entity> view() noexcept {
         componentID_t id = ComponentManager::componentID<T>();
@@ -292,9 +354,16 @@ public:
     }
 
 
-
-
-
+    
+    /**
+     *@brief 
+     * 
+     * @tparam T 
+     * @tparam Args 
+     * @param entity 
+     * @param args 
+     * @return std::void_t<decltype(new T{ std::forward<Args>(args)... }) > 
+     */
     template<typename T,typename...Args>
     auto emplace(Entity entity,Args&&...args) noexcept ->
         std::void_t<decltype(new T{ std::forward<Args>(args)... }) > {
@@ -306,8 +375,15 @@ public:
 
 
 
-
-
+    /**
+     *@brief 
+     * 
+     * @tparam T 
+     * @tparam Args 
+     * @param entity 
+     * @param args 
+     * @return std::void_t<decltype(new T{ std::forward<Args>(args)... }) > 
+     */
     template<typename T,typename...Args>
     auto replace(Entity entity,Args&&...args) noexcept ->
         std::void_t<decltype(new T{ std::forward<Args>(args)... }) > {
@@ -318,8 +394,15 @@ public:
 
 
 
-
-
+    /**
+     *@brief 
+     * 
+     * @tparam T 
+     * @tparam Args 
+     * @param entity 
+     * @param args 
+     * @return std::void_t<decltype(new T{ std::forward<Args>(args)... }) > 
+     */
     template<typename T,typename...Args>
     auto emplace_or_replace(Entity entity,Args&&...args) noexcept ->
     std::void_t<decltype(new T{ std::forward<Args>(args)... }) > {
@@ -335,8 +418,15 @@ public:
 
 
 
-
-
+    /**
+     *@brief 
+     * 
+     * @tparam T 
+     * @tparam Args 
+     * @param entity 
+     * @return true 
+     * @return false 
+     */
     template<typename T,typename...Args>
     bool all_of(Entity entity) const noexcept {
         componentID_t id = ComponentManager::componentID<T>();
@@ -350,8 +440,15 @@ public:
 
 
 
-
-
+    /**
+     *@brief 
+     * 
+     * @tparam T 
+     * @tparam Args 
+     * @param entity 
+     * @return true 
+     * @return false 
+     */
     template<typename T,typename...Args>
     bool any_of(Entity entity) const noexcept {
         componentID_t id = ComponentManager::componentID<T>();
@@ -365,8 +462,13 @@ public:
 
 
 
-
-
+    /**
+     *@brief 
+     * 
+     * @tparam T 
+     * @tparam Args 
+     * @param entity 
+     */
     template<typename T,typename...Args>
     void remove(Entity entity) noexcept {
         componentID_t id = ComponentManager::componentID<T>();
@@ -380,8 +482,14 @@ public:
 
 
 
-
-
+    /**
+     *@brief 
+     * 
+     * @tparam T 
+     * @tparam Ts 
+     * @param entity 
+     * @return auto 
+     */
     template<typename T,typename...Ts>
     auto get(Entity entity) noexcept {
         componentID_t id = ComponentManager::componentID<T>();
@@ -395,8 +503,14 @@ public:
 
 
 
-
-
+    /**
+     *@brief 
+     * 
+     * @tparam T 
+     * @tparam Ts 
+     * @param entity 
+     * @return auto 
+     */
     template<typename T,typename...Ts>
     auto try_get(Entity entity) noexcept {
         componentID_t id = ComponentManager::componentID<T>();
@@ -411,8 +525,15 @@ public:
 
 
 
-
-
+    /**
+     *@brief Get the or emplace object
+     * 
+     * @tparam T 
+     * @tparam Ts 
+     * @param entity 
+     * @return std::conditional_t < sizeof...(Ts) == 0,
+     * decltype(new T{}),std::tuple<T*,std::add_pointer_t<Ts>... >> 
+     */
     template<typename T,typename...Ts>
     std::conditional_t < sizeof...(Ts) == 0,
     decltype(new T{}),std::tuple<T*,std::add_pointer_t<Ts>... >>
@@ -436,8 +557,11 @@ public:
 
 
 
-
-
+    /**
+     *@brief 
+     * 
+     * @return Entity 
+     */
     Entity create() noexcept {
         Entity entity = _get_entity();
         world_.entityMap_.insert(entity);
@@ -446,8 +570,11 @@ public:
 
 
 
-
-
+    /**
+     *@brief 
+     * 
+     * @param entity 
+     */
     void destory(Entity entity) noexcept {
         World::componentSet_t& components = world_.entityMap_[entity];
         for (ComponentInfo& info : components) {
@@ -460,11 +587,17 @@ public:
 
 
 
-
-
-
 private:
 
+
+    
+    /**
+     * @brief 
+     * 
+     * @tparam T 
+     * @tparam Args 
+     * @param entitys 
+     */
     template<typename T,typename...Args>
     void doView(std::vector<Entity>& entitys) {
         componentID_t id = ComponentManager::componentID<T>();
@@ -480,6 +613,7 @@ private:
     }
 
 
+    
 private:
     World& world_;
 };

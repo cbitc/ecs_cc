@@ -5,37 +5,48 @@
 using namespace ECS;
 using std::cout, std::cin;
 
-struct A
+struct Position final
 {
-    int age;
-    bool isMan;
-    std::string name;
+    float x,y;
 };
 
-struct B
+struct HP final
 {
-    int id;
-    float score;
+    float hp;
 };
+
+
+
+
 
 void worldLog(const World& world) {
+    printf("\n");
     printf("entitys:\n"),world.entitysLog();
     printf("componentsMap:\n"),world.componentsMapLog();
+    printf("\n");
 }
 
 int main() {
     World world;
     Registry registry(world);
-    Entity e1 = registry.create();
-    registry.emplace<A>(e1, 18, true, "hcc");
-    registry.emplace<B>(e1, 1, 100.0f);
 
-    Entity e2 = registry.create();
-    registry.emplace<B>(e2, 2, 98.0f);
+    Entity entity = registry.create();
+    registry.emplace<std::string>(entity,"hcc");
+    registry.emplace<int>(entity,18);
 
-    worldLog(world);
+    auto [name,age] = registry.get_or_emplace<std::string,double>(entity);
+    registry.replace<std::string>(entity,"hzz");
 
-    registry.erase<A,B,int>(e1);
+    if (name) {
+        cout << *name;
+    }
+    if (age) {
+        cout << *age;
+    } else {
+        cout << "null";
+    }
+    cout << '\n';
+
     worldLog(world);
     return 0;
 }
