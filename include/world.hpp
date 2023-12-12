@@ -4,6 +4,7 @@
 #include"entity.hpp"
 #include"dataStruct.hpp"
 #include"component.hpp"
+#include"resource.hpp"
 #include<tuple>
 
 
@@ -287,8 +288,48 @@ class World
         std::vector<CDataStruct::SparseSet<Entity>> map_;
     };
 
-    
 
+
+
+
+    class ResourceContainer final
+    {
+
+    public:
+        
+        void insert(resourceID_t id,void* data) noexcept {
+            if (id >= resources_.size()) {
+                resources_.resize(id + 1,nullptr);
+            }
+            resources_[id] = data;
+        }
+
+
+        
+        bool contain(resourceID_t id) const noexcept {
+            return id < resources_.size() && resources_[id];
+        }
+
+
+        
+        bool remove(resourceID_t id) noexcept {
+            if (!contain(id)) {
+                return false;
+            }
+            resources_[id] = nullptr;
+        }
+
+
+        
+        void* operator[](resourceID_t id) noexcept {
+            return resources_[id];
+        }
+
+    private:
+        std::vector<void*> resources_;
+    };
+
+    
 public:
 
     /// @brief 表示实体到组件集合映射的组件集合的类型
@@ -303,6 +344,9 @@ public:
     /// @brief 表示组件到实体集合映射的类型
     using componentMap_t = ComponentMap;
 
+    /// @brief 存储资源的集合
+    using resourceSet_t = ResourceContainer;
+
 private:
     
     /// @brief 实体到组件集合映射的容器
@@ -310,6 +354,9 @@ private:
 
     /// @brief 组件到实体集合映射的容器
     componentMap_t componentMap_;
+
+    /// @brief 资源容器
+    resourceSet_t resources_;
 
 public:
     void entitysLog()const {
@@ -628,19 +675,45 @@ public:
 
     template<typename T>
     T* getResource() noexcept {
-        
+        resourceID_t id = ResourceManager::resourceID<T>();
+        T* res = nullptr;
+        if (world_.resources_.contain(id)) {
+            res = static_cast<T*>(world_.resources_[id]);
+        }
+        return res;
     }
 
 
 
-    template<typename t>
-    void addResource() noexcept {
-
+    template<typename T,typename...Args>
+    auto createResource(Args&&...args) noexcept
+        -> decltype(new T{ std::forward<Args>(args)... }) {
+        resourceID_t id = ResourceManager::resourceID<T>();
+        if (world_.resources_.contain(id)) {
+            return static_cast<T*>(world_.resources_[id]);
+        }
+        T* res = ResourceManager::instance<T>(std::forward<Args>(args)...);
+        world_.resources_.insert(id,res);
+        return res;
     }
 
+
+
+    template<typename T>
+    bool hasResource() const noexcept {
+        resourceID_t id = ResourceManager::resourceID<T>();
+        return world_.resources_.contain(id);
+    }
 
 
     
+    template<typename T>
+    void destoryResource() noexcept {
+        resourceID_t id = ResourceManager::resourceID<T>();
+        ResourceManager::destory<T>(world_.resources_[id]);
+        world_.resources_.remove(id);
+    }
+
 private:
 
 

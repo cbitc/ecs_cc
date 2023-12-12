@@ -16,7 +16,10 @@ struct HP final
 };
 
 
-
+struct Time final
+{
+    float time;
+};
 
 
 void worldLog(const World& world) {
@@ -29,23 +32,12 @@ void worldLog(const World& world) {
 int main() {
     World world;
     Registry registry(world);
-
-    Entity entity = registry.create();
-    registry.emplace<std::string>(entity,"hcc");
-    registry.emplace<int>(entity,18);
-
-    auto [name,age] = registry.get_or_emplace<std::string,double>(entity);
-    registry.replace<std::string>(entity,"hzz");
-
-    if (name) {
-        cout << *name;
-    }
-    if (age) {
-        cout << *age;
-    } else {
-        cout << "null";
-    }
-    cout << '\n';
+    registry.createResource<Time>(100.f);
+    registry.createResource<std::string>("33");
+    Time* time = registry.getResource<Time>();
+    std::string* name = registry.getResource<std::string>();
+    cout << *name;
+    bool st = registry.hasResource<Time>();
 
     worldLog(world);
     return 0;
