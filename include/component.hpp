@@ -58,9 +58,10 @@ public:
     template<typename...Args>
     static auto instance(Args&&...args) -> decltype(new T{ std::forward<Args>(args)... }) {
         if (cache_.empty()) {
-            cache_.push_back(new T{ std::forward<Args>(args)... });
+            return new T{ std::forward<Args>(args)... };
         }
         T* result = cache_.back();
+        *result = T{ std::forward<Args>(args)... };
         cache_.pop_back();
         return result;
     }
